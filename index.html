@@ -150,6 +150,15 @@
         .btn-purple:hover {
             background: #7e22ce;
         }
+        .btn-red {
+            background: #ef4444;
+            color: white;
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+        }
+        .btn-red:hover {
+            background: #dc2626;
+        }
         .qr-box {
             background: white;
             border-radius: 0.5rem;
@@ -306,12 +315,37 @@
             width: 100%;
             height: 100%;
         }
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div id="root">
+        <div class="loading">Loading...</div>
+    </div>
     
-    <script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, onValue, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // Firebase configuration - REPLACE WITH YOUR OWN CONFIG
+        const firebaseConfig = {
+  apiKey: "AIzaSyD8QQ1IzI31E0WXjf4azJ0JlTnkHLba6_E",
+  authDomain: "taskmaster-d8b0d.firebaseapp.com",
+  databaseURL: "https://taskmaster-d8b0d-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "taskmaster-d8b0d",
+  storageBucket: "taskmaster-d8b0d.firebasestorage.app",
+  messagingSenderId: "384464868716",
+  appId: "1:384464868716:web:4e8f2ef25b088ba7c1cf49"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
         const teams = [
             { name: 'Manuka', code: 'xk7mp9qw' },
             { name: 'Rimu', code: 'r5nt8jvz' },
@@ -364,40 +398,45 @@
 
         let currentView = 'admin';
         let selectedTeam = null;
-        let tasks = [];
+        let tasks = defaultTasks;
         let teamData = {};
 
-        function loadData() {
-            const stored = localStorage.getItem('taskmaster-data');
-            if (stored) {
-                const data = JSON.parse(stored);
+        // Listen for real-time updates
+        const dataRef = ref(database, 'taskmaster');
+        onValue(dataRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
                 tasks = data.tasks || defaultTasks;
                 teamData = data.teamData || {};
             } else {
-                tasks = defaultTasks;
-                initializeTeamData();
+                // Initialize database if empty
+                initializeData();
             }
-        }
+            render();
+        });
 
-        function initializeTeamData() {
-            teamData = {};
+        function initializeData() {
+            const initialData = {};
             teams.forEach(team => {
-                teamData[team.name] = Array(40).fill(false);
+                initialData[team.name] = Array(40).fill(false);
             });
-            saveData();
-        }
-
-        function saveData() {
-            localStorage.setItem('taskmaster-data', JSON.stringify({
-                tasks: tasks,
-                teamData: teamData
-            }));
+            
+            set(dataRef, {
+                tasks: defaultTasks,
+                teamData: initialData
+            });
         }
 
         function toggleTask(teamName, taskIndex) {
-            teamData[teamName][taskIndex] = !teamData[teamName][taskIndex];
-            saveData();
-            render();
+            const updates = {};
+            updates[`teamData/${teamName}/${taskIndex}`] = !teamData[teamName][taskIndex];
+            update(dataRef, updates);
+        }
+
+        function resetAllData() {
+            if (confirm('Are you sure you want to reset ALL team progress? This cannot be undone!')) {
+                initializeData();
+            }
         }
 
         function generateTeamURL(teamCode) {
@@ -478,7 +517,7 @@
                                             <div class="url-box">
                                                 <div class="url-label">Team URL:</div>
                                                 <div class="url-text">${teamUrl}</div>
-                                                <button class="btn btn-blue" onclick="copyToClipboard('${teamUrl}')">
+                                                <button class="btn btn-blue" onclick="window.copyToClipboard('${teamUrl}')">
                                                     Copy URL
                                                 </button>
                                             </div>
@@ -487,7 +526,7 @@
                                                 <img src="${generateQRCode(team.code)}" alt="QR Code for ${team.name}">
                                             </div>
                                             
-                                            <button class="btn btn-purple" onclick="viewTeam('${team.name}')">
+                                            <button class="btn btn-purple" onclick="window.viewTeam('${team.name}')">
                                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                     <line x1="8" y1="6" x2="21" y2="6"/>
                                                     <line x1="8" y1="12" x2="21" y2="12"/>
@@ -502,6 +541,10 @@
                                     `;
                                 }).join('')}
                             </div>
+                            
+                            <button class="btn btn-red" onclick="window.resetAllData()">
+                                Reset All Progress
+                            </button>
                         </div>
 
                         <div class="card">
@@ -570,7 +613,7 @@
                                 ${tasks.map((task, index) => {
                                     const isCompleted = teamData[selectedTeam]?.[index] || false;
                                     return `
-                                        <div class="task-item ${isCompleted ? 'completed' : ''}" onclick="toggleTask('${selectedTeam}', ${index})">
+                                        <div class="task-item ${isCompleted ? 'completed' : ''}" onclick="window.toggleTask('${selectedTeam}', ${index})">
                                             <div class="task-icon ${isCompleted ? 'icon-green' : 'icon-gray'}">
                                                 ${isCompleted ? `
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -612,9 +655,6 @@
             }
         }
 
-        // Initialize
-        loadData();
-
         // Check URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const teamCode = urlParams.get('team');
@@ -627,7 +667,11 @@
             }
         }
 
-        render();
+        // Expose functions globally
+        window.toggleTask = toggleTask;
+        window.viewTeam = viewTeam;
+        window.copyToClipboard = copyToClipboard;
+        window.resetAllData = resetAllData;
     </script>
 </body>
 </html>
