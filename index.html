@@ -620,6 +620,7 @@
             const stats = getCompletionStats(selectedTeam);
             const team = teams.find(t => t.name === selectedTeam);
             const gradient = `linear-gradient(135deg, ${team.colors.from} 0%, ${team.colors.via} 50%, ${team.colors.to} 100%)`;
+            const progressGradient = `linear-gradient(90deg, ${team.colors.from} 0%, ${team.colors.to} 100%)`;
             
             return `
                 <div class="bg-gradient-blue" style="background: ${gradient};">
@@ -633,10 +634,10 @@
                             <div class="progress-box" style="margin-top: 1rem;">
                                 <div class="progress-header">
                                     <span class="progress-label">Progress</span>
-                                    <span class="progress-score">${stats.completed}/40</span>
+                                    <span class="progress-score" style="color: ${team.colors.via};">${stats.completed}/40</span>
                                 </div>
                                 <div class="progress-bar-large">
-                                    <div class="progress-fill-large" style="width: ${stats.percentage}%"></div>
+                                    <div class="progress-fill-large" style="width: ${stats.percentage}%; background: ${progressGradient};"></div>
                                 </div>
                                 <div class="progress-percentage">${stats.percentage}% complete</div>
                             </div>
@@ -644,7 +645,7 @@
 
                         <div class="card">
                             <div class="tasks-header">
-                                <div class="task-icon icon-yellow">
+                                <div class="task-icon" style="color: ${team.colors.via};">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
                                         <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
@@ -660,8 +661,8 @@
                                 ${tasks.map((task, index) => {
                                     const isCompleted = teamData[selectedTeam]?.[index] || false;
                                     return `
-                                        <div class="task-item ${isCompleted ? 'completed' : ''}" onclick="window.toggleTask('${selectedTeam}', ${index})">
-                                            <div class="task-icon ${isCompleted ? 'icon-green' : 'icon-gray'}">
+                                        <div class="task-item ${isCompleted ? 'completed' : ''}" onclick="window.toggleTask('${selectedTeam}', ${index})" style="${!isCompleted ? `border-color: ${team.colors.to}33;` : ''}">
+                                            <div class="task-icon ${isCompleted ? 'icon-green' : ''}" style="${!isCompleted ? `color: ${team.colors.via};` : ''}">
                                                 ${isCompleted ? `
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                         <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
@@ -674,7 +675,7 @@
                                                 `}
                                             </div>
                                             <div class="task-content">
-                                                <span class="task-number ${isCompleted ? 'completed' : ''}">Task ${index + 1}</span>
+                                                <span class="task-number ${isCompleted ? 'completed' : ''}" style="${!isCompleted ? `color: ${team.colors.via};` : ''}">Task ${index + 1}</span>
                                                 <p class="task-text ${isCompleted ? 'completed' : ''}">${task}</p>
                                             </div>
                                         </div>
