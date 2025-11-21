@@ -244,7 +244,7 @@
             background: linear-gradient(90deg, #9333ea 0%, #ec4899 100%);
             height: 100%;
             border-radius: 9999px;
-            transition: width 0.5s;
+            transition: width: 0.5s;
         }
         .progress-percentage {
             text-align: right;
@@ -320,6 +320,13 @@
             padding: 2rem;
             color: #6b7280;
         }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -331,26 +338,40 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, set, onValue, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-        // Firebase configuration - REPLACE WITH YOUR OWN CONFIG
+        // Firebase configuration
         const firebaseConfig = {
-  apiKey: "AIzaSyD8QQ1IzI31E0WXjf4azJ0JlTnkHLba6_E",
-  authDomain: "taskmaster-d8b0d.firebaseapp.com",
-  databaseURL: "https://taskmaster-d8b0d-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "taskmaster-d8b0d",
-  storageBucket: "taskmaster-d8b0d.firebasestorage.app",
-  messagingSenderId: "384464868716",
-  appId: "1:384464868716:web:4e8f2ef25b088ba7c1cf49"
-};
+            apiKey: "AIzaSyD8QQ1IzI31E0WXjf4azJ0JlTnkHLba6_E",
+            authDomain: "taskmaster-d8b0d.firebaseapp.com",
+            databaseURL: "https://taskmaster-d8b0d-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "taskmaster-d8b0d",
+            storageBucket: "taskmaster-d8b0d.firebasestorage.app",
+            messagingSenderId: "384464868716",
+            appId: "1:384464868716:web:4e8f2ef25b088ba7c1cf49"
+        };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+        let app, database;
+        
+        try {
+            // Initialize Firebase
+            app = initializeApp(firebaseConfig);
+            database = getDatabase(app);
+            console.log('Firebase initialized successfully');
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+            document.getElementById('root').innerHTML = `
+                <div class="error">
+                    <h2>Connection Error</h2>
+                    <p>Could not connect to Firebase: ${error.message}</p>
+                    <p>Please check your Firebase configuration and database rules.</p>
+                </div>
+            `;
+        }
 
         const teams = [
-            { name: 'Manuka', code: 'xk7mp9qw' },
-            { name: 'Rimu', code: 'r5nt8jvz' },
-            { name: 'Kawakawa', code: 'f2hy6lbg' },
-            { name: 'Kowhai', code: 'w3ds9kcm' }
+            { name: 'Manuka', code: 'xk7mp9qw', colors: { from: '#78350f', via: '#92400e', to: '#a16207' } },
+            { name: 'Rimu', code: 'r5nt8jvz', colors: { from: '#ea580c', via: '#f97316', to: '#fb923c' } },
+            { name: 'Kawakawa', code: 'f2hy6lbg', colors: { from: '#15803d', via: '#16a34a', to: '#22c55e' } },
+            { name: 'Kowhai', code: 'w3ds9kcm', colors: { from: '#ca8a04', via: '#eab308', to: '#fde047' } }
         ];
 
         const defaultTasks = [
@@ -402,18 +423,31 @@ const database = getDatabase(app);
         let teamData = {};
 
         // Listen for real-time updates
-        const dataRef = ref(database, 'taskmaster');
-        onValue(dataRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                tasks = data.tasks || defaultTasks;
-                teamData = data.teamData || {};
-            } else {
-                // Initialize database if empty
-                initializeData();
-            }
-            render();
-        });
+        if (database) {
+            const dataRef = ref(database, 'taskmaster');
+            onValue(dataRef, (snapshot) => {
+                console.log('Data received from Firebase:', snapshot.val());
+                const data = snapshot.val();
+                if (data) {
+                    tasks = data.tasks || defaultTasks;
+                    teamData = data.teamData || {};
+                } else {
+                    // Initialize database if empty
+                    console.log('Initializing database...');
+                    initializeData();
+                }
+                render();
+            }, (error) => {
+                console.error('Firebase read error:', error);
+                document.getElementById('root').innerHTML = `
+                    <div class="error">
+                        <h2>Database Error</h2>
+                        <p>${error.message}</p>
+                        <p>Please check your Firebase database rules. They should be set to allow read and write access.</p>
+                    </div>
+                `;
+            });
+        }
 
         function initializeData() {
             const initialData = {};
@@ -421,16 +455,27 @@ const database = getDatabase(app);
                 initialData[team.name] = Array(40).fill(false);
             });
             
+            const dataRef = ref(database, 'taskmaster');
             set(dataRef, {
                 tasks: defaultTasks,
                 teamData: initialData
+            }).then(() => {
+                console.log('Database initialized successfully');
+            }).catch((error) => {
+                console.error('Error initializing database:', error);
             });
         }
 
         function toggleTask(teamName, taskIndex) {
+            const dataRef = ref(database, 'taskmaster');
             const updates = {};
             updates[`teamData/${teamName}/${taskIndex}`] = !teamData[teamName][taskIndex];
-            update(dataRef, updates);
+            update(dataRef, updates).then(() => {
+                console.log('Task updated successfully');
+            }).catch((error) => {
+                console.error('Error updating task:', error);
+                alert('Error updating task. Please try again.');
+            });
         }
 
         function resetAllData() {
@@ -573,14 +618,16 @@ const database = getDatabase(app);
 
         function renderTeam() {
             const stats = getCompletionStats(selectedTeam);
+            const team = teams.find(t => t.name === selectedTeam);
+            const gradient = `linear-gradient(135deg, ${team.colors.from} 0%, ${team.colors.via} 50%, ${team.colors.to} 100%)`;
             
             return `
-                <div class="bg-gradient-blue">
+                <div class="bg-gradient-blue" style="background: ${gradient};">
                     <div class="container-small">
                         <div class="card">
                             <div>
                                 <h1 style="font-size: 1.875rem; font-weight: bold; color: #1f2937;">${selectedTeam}</h1>
-                                <p style="color: #6b7280; margin-top: 0.25rem;">Complete as many tasks as you can!</p>
+                                <p style="color: #6b7280; margin-top: 0.25rem;">Complete all 40 tasks to win!</p>
                             </div>
                             
                             <div class="progress-box" style="margin-top: 1rem;">
