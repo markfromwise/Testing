@@ -621,6 +621,7 @@
             const team = teams.find(t => t.name === selectedTeam);
             const gradient = `linear-gradient(135deg, ${team.colors.from} 0%, ${team.colors.via} 50%, ${team.colors.to} 100%)`;
             const progressGradient = `linear-gradient(90deg, ${team.colors.from} 0%, ${team.colors.to} 100%)`;
+            const lightBoxGradient = `linear-gradient(90deg, ${team.colors.to}20 0%, ${team.colors.to}30 100%)`;
             
             return `
                 <div class="bg-gradient-blue" style="background: ${gradient};">
@@ -631,7 +632,7 @@
                                 <p style="color: #6b7280; margin-top: 0.25rem;">Complete all 40 tasks to win!</p>
                             </div>
                             
-                            <div class="progress-box" style="margin-top: 1rem;">
+                            <div class="progress-box" style="margin-top: 1rem; background: ${lightBoxGradient};">
                                 <div class="progress-header">
                                     <span class="progress-label">Progress</span>
                                     <span class="progress-score" style="color: ${team.colors.via};">${stats.completed}/40</span>
