@@ -502,19 +502,19 @@
         ];
 
         const defaultTasks = [
-            "It once was there, but now it's gone. Count the white squares and report the number to a Taskmaster",
+            "It once was there, but now it's gone. Count the white squares and report the number to the Taskmaster via the app",
             "Find something that weighs exactly 100 grams and provide it to a Taskmaster",
             "Fly a paper plane the furtherest",
             "Mark the location of the green door on the map and show it to the Taskmaster",
             "Create a team handshake and show a Taskmaster. The more complex but smoothly executed the more points",
-            "Film a stranger saying your team motto and show it to a Taskmaster",
-            "How many steps is it from the Camelia Garden to the Rhododendron Lawn",
-            "Take a photo of your team recreating a famous movie scene or piece of art and show it to a Taskmaster – if they recognise it you get the points",
-            "Recreate this photo and show the Taskmaster – the better the recreation, the more points you get",
-            "Film two different strangers saying hello in different languages and show a Taskmaster",
+            "Film a stranger saying your team motto and show it to a Taskmaster - you can't use the app for this",
+            "How many steps is it from the Camelia Garden to the Rhododendron Lawn? Submit your answer via the app",
+            "Take a photo of your team recreating a famous movie scene or piece of art and submit it to the Taskmaster via the app – if they recognise it you get the points",
+            "Recreate this photo and submit to the Taskmaster via the app – the better the recreation, the more points you get",
+            "Film two different strangers saying hello in different languages and show a Taskmaster - you can't use the app for this",
             "Create an origami animal and show a Taskmaster",
-            "Mark the location of Merle’s seat on the map and show a Taskmaster",
-            "Create a ‘say what you see’ and present it to the Taskmaster",
+            "Mark the location of Merle's seat on the map and show a Taskmaster",
+            "Create a 'say what you see' and present it to the Taskmaster - don't use the app for this",
             "Get a stranger to draw your team logo",
             "Make a hat out of newspaper",
             "Take a selfie with a landmark",
@@ -607,10 +607,24 @@
                 };
                 
                 await update(dataRef, updates);
-                alert('Submission successful!');
+                alert('Submitted to Taskmaster!');
             } catch (error) {
                 console.error('Submission error:', error);
                 alert('Error submitting. Please try again.');
+            }
+        }
+
+        async function markComplete(teamName, taskIndex) {
+            try {
+                const dataRef = ref(database, 'taskmaster');
+                const updates = {};
+                updates[`teamData/${teamName}/${taskIndex}`] = true;
+                
+                await update(dataRef, updates);
+                alert('Task marked complete!');
+            } catch (error) {
+                console.error('Error marking complete:', error);
+                alert('Error marking complete. Please try again.');
             }
         }
 
@@ -892,20 +906,23 @@
                                                 <div id="form-${index}" class="submission-form">
                                                     <form onsubmit="window.handleSubmit('${selectedTeam}', ${index}, event)">
                                                         <div class="form-group">
-                                                            <label class="form-label">Description (optional)</label>
-                                                            <textarea id="desc-${index}" class="form-textarea" placeholder="Describe what you did..."></textarea>
+                                                            <label class="form-label">Answer (optional)</label>
+                                                            <textarea id="desc-${index}" class="form-textarea" placeholder="Enter your answer..."></textarea>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label class="form-label">Photo Evidence</label>
+                                                            <label class="form-label">Photo Evidence (optional)</label>
                                                             <div class="file-input-wrapper">
                                                                 <label class="file-input-btn">
-                                                                    📷 Choose Photo
+                                                                    📷 Take Photo
                                                                     <input type="file" id="photo-${index}" accept="image/*" capture="environment" onchange="window.handleFileSelect(${index}, event)">
                                                                 </label>
                                                             </div>
                                                             <div id="preview-${index}"></div>
                                                         </div>
-                                                        <button type="submit" class="btn btn-purple">Submit Task</button>
+                                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                                            <button type="button" class="btn btn-blue" onclick="window.markComplete('${selectedTeam}', ${index})">Mark Complete</button>
+                                                            <button type="submit" class="btn btn-purple">Submit to Taskmaster</button>
+                                                        </div>
                                                     </form>
                                                 </div>
                                             ` : submission ? `
@@ -955,6 +972,7 @@
         window.toggleTaskForm = toggleTaskForm;
         window.handleFileSelect = handleFileSelect;
         window.handleSubmit = handleSubmit;
+        window.markComplete = markComplete;
         window.viewTeam = viewTeam;
         window.copyToClipboard = copyToClipboard;
         window.resetAllData = resetAllData;
