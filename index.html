@@ -159,6 +159,10 @@
         .btn-red:hover {
             background: #dc2626;
         }
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
         .qr-box {
             background: white;
             border-radius: 0.5rem;
@@ -244,7 +248,7 @@
             background: linear-gradient(90deg, #9333ea 0%, #ec4899 100%);
             height: 100%;
             border-radius: 9999px;
-            transition: width: 0.5s;
+            transition: width 0.5s;
         }
         .progress-percentage {
             text-align: right;
@@ -267,22 +271,21 @@
             gap: 0.5rem;
         }
         .task-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 1rem;
             border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s;
             border: 2px solid #e5e7eb;
             background: #f9fafb;
-        }
-        .task-item:hover {
-            border-color: #d8b4fe;
+            overflow: hidden;
         }
         .task-item.completed {
             background: #f0fdf4;
             border-color: #86efac;
+        }
+        .task-header-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            cursor: pointer;
         }
         .task-icon {
             width: 1.5rem;
@@ -305,7 +308,88 @@
         }
         .task-text.completed {
             color: #15803d;
-            text-decoration: line-through;
+        }
+        .submission-form {
+            padding: 1rem;
+            background: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+            display: none;
+        }
+        .submission-form.show {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+        .form-textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            min-height: 80px;
+            resize: vertical;
+        }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        .file-input-btn {
+            border: 2px dashed #d1d5db;
+            background: white;
+            color: #6b7280;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            display: block;
+            text-align: center;
+            width: 100%;
+        }
+        .file-input-btn:hover {
+            border-color: #9333ea;
+            color: #9333ea;
+        }
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        .preview-image {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 0.375rem;
+            margin-top: 0.5rem;
+        }
+        .submission-display {
+            padding: 1rem;
+            background: #f0fdf4;
+            border-top: 1px solid #86efac;
+        }
+        .submission-photo {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 0.375rem;
+            margin-bottom: 0.5rem;
+        }
+        .submission-text {
+            font-size: 0.875rem;
+            color: #374151;
+            font-style: italic;
         }
         .icon-yellow { color: #eab308; }
         .icon-purple { color: #9333ea; }
@@ -327,6 +411,49 @@
             border-radius: 0.5rem;
             margin: 1rem;
         }
+        .tab-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: #e5e7eb;
+            color: #6b7280;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .tab-btn.active {
+            background: #9333ea;
+            color: white;
+        }
+        .submission-item {
+            background: #f9fafb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 2px solid #e5e7eb;
+        }
+        .submission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+        .submission-team {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .submission-task {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        .submission-timestamp {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
     </style>
 </head>
 <body>
@@ -337,6 +464,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, set, onValue, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
         // Firebase configuration
         const firebaseConfig = {
@@ -349,12 +477,12 @@
             appId: "1:384464868716:web:4e8f2ef25b088ba7c1cf49"
         };
 
-        let app, database;
+        let app, database, storage;
         
         try {
-            // Initialize Firebase
             app = initializeApp(firebaseConfig);
             database = getDatabase(app);
+            storage = getStorage(app);
             console.log('Firebase initialized successfully');
         } catch (error) {
             console.error('Firebase initialization error:', error);
@@ -362,7 +490,6 @@
                 <div class="error">
                     <h2>Connection Error</h2>
                     <p>Could not connect to Firebase: ${error.message}</p>
-                    <p>Please check your Firebase configuration and database rules.</p>
                 </div>
             `;
         }
@@ -418,34 +545,27 @@
         ];
 
         let currentView = 'admin';
+        let adminTab = 'overview';
         let selectedTeam = null;
         let tasks = defaultTasks;
         let teamData = {};
+        let submissions = {};
 
         // Listen for real-time updates
         if (database) {
             const dataRef = ref(database, 'taskmaster');
             onValue(dataRef, (snapshot) => {
-                console.log('Data received from Firebase:', snapshot.val());
                 const data = snapshot.val();
                 if (data) {
                     tasks = data.tasks || defaultTasks;
                     teamData = data.teamData || {};
+                    submissions = data.submissions || {};
                 } else {
-                    // Initialize database if empty
-                    console.log('Initializing database...');
                     initializeData();
                 }
                 render();
             }, (error) => {
                 console.error('Firebase read error:', error);
-                document.getElementById('root').innerHTML = `
-                    <div class="error">
-                        <h2>Database Error</h2>
-                        <p>${error.message}</p>
-                        <p>Please check your Firebase database rules. They should be set to allow read and write access.</p>
-                    </div>
-                `;
             });
         }
 
@@ -458,28 +578,44 @@
             const dataRef = ref(database, 'taskmaster');
             set(dataRef, {
                 tasks: defaultTasks,
-                teamData: initialData
-            }).then(() => {
-                console.log('Database initialized successfully');
-            }).catch((error) => {
-                console.error('Error initializing database:', error);
+                teamData: initialData,
+                submissions: {}
             });
         }
 
-        function toggleTask(teamName, taskIndex) {
-            const dataRef = ref(database, 'taskmaster');
-            const updates = {};
-            updates[`teamData/${teamName}/${taskIndex}`] = !teamData[teamName][taskIndex];
-            update(dataRef, updates).then(() => {
-                console.log('Task updated successfully');
-            }).catch((error) => {
-                console.error('Error updating task:', error);
-                alert('Error updating task. Please try again.');
-            });
+        async function submitTask(teamName, taskIndex, description, photoFile) {
+            try {
+                let photoURL = null;
+                
+                if (photoFile) {
+                    const fileName = `${teamName}_task${taskIndex}_${Date.now()}.jpg`;
+                    const fileRef = storageRef(storage, `submissions/${fileName}`);
+                    await uploadBytes(fileRef, photoFile);
+                    photoURL = await getDownloadURL(fileRef);
+                }
+                
+                const submissionKey = `${teamName}_${taskIndex}`;
+                const dataRef = ref(database, 'taskmaster');
+                const updates = {};
+                updates[`teamData/${teamName}/${taskIndex}`] = true;
+                updates[`submissions/${submissionKey}`] = {
+                    team: teamName,
+                    taskIndex: taskIndex,
+                    description: description || '',
+                    photoURL: photoURL,
+                    timestamp: Date.now()
+                };
+                
+                await update(dataRef, updates);
+                alert('Submission successful!');
+            } catch (error) {
+                console.error('Submission error:', error);
+                alert('Error submitting. Please try again.');
+            }
         }
 
         function resetAllData() {
-            if (confirm('Are you sure you want to reset ALL team progress? This cannot be undone!')) {
+            if (confirm('Are you sure you want to reset ALL team progress and submissions? This cannot be undone!')) {
                 initializeData();
             }
         }
@@ -510,11 +646,124 @@
             });
         }
 
+        function toggleTaskForm(taskIndex) {
+            const form = document.getElementById(`form-${taskIndex}`);
+            if (form) {
+                form.classList.toggle('show');
+            }
+        }
+
+        function handleFileSelect(taskIndex, event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById(`preview-${taskIndex}`);
+            
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.innerHTML = `<img src="${e.target.result}" class="preview-image">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleSubmit(teamName, taskIndex, event) {
+            event.preventDefault();
+            const description = document.getElementById(`desc-${taskIndex}`).value;
+            const photoInput = document.getElementById(`photo-${taskIndex}`);
+            const photoFile = photoInput.files[0];
+            
+            submitTask(teamName, taskIndex, description, photoFile);
+        }
+
+        function setAdminTab(tab) {
+            adminTab = tab;
+            render();
+        }
+
         function renderAdmin() {
             const sortedTeams = teams.map(team => ({
                 ...team,
                 ...getCompletionStats(team.name)
             })).sort((a, b) => b.completed - a.completed);
+
+            let tabContent = '';
+            
+            if (adminTab === 'overview') {
+                tabContent = `
+                    <div class="grid grid-2">
+                        ${teams.map(team => {
+                            const stats = getCompletionStats(team.name);
+                            const teamUrl = generateTeamURL(team.code);
+                            return `
+                                <div class="team-card">
+                                    <div class="team-header">
+                                        <div class="team-name">
+                                            <div class="task-icon icon-purple">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                                    <circle cx="9" cy="7" r="4"/>
+                                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                                </svg>
+                                            </div>
+                                            <h2>${team.name}</h2>
+                                        </div>
+                                        <div class="team-stats">
+                                            <div class="team-score">${stats.completed}/40</div>
+                                            <div class="team-percentage">${stats.percentage}% complete</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="url-box">
+                                        <div class="url-label">Team URL:</div>
+                                        <div class="url-text">${teamUrl}</div>
+                                        <button class="btn btn-blue" onclick="window.copyToClipboard('${teamUrl}')">
+                                            Copy URL
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="qr-box">
+                                        <img src="${generateQRCode(team.code)}" alt="QR Code for ${team.name}">
+                                    </div>
+                                    
+                                    <button class="btn btn-purple" onclick="window.viewTeam('${team.name}')">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="8" y1="6" x2="21" y2="6"/>
+                                            <line x1="8" y1="12" x2="21" y2="12"/>
+                                            <line x1="8" y1="18" x2="21" y2="18"/>
+                                            <line x1="3" y1="6" x2="3.01" y2="6"/>
+                                            <line x1="3" y1="12" x2="3.01" y2="12"/>
+                                            <line x1="3" y1="18" x2="3.01" y2="18"/>
+                                        </svg>
+                                        View Team Tasks
+                                    </button>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            } else {
+                const submissionsList = Object.values(submissions).sort((a, b) => b.timestamp - a.timestamp);
+                tabContent = `
+                    <div>
+                        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">All Submissions (${submissionsList.length})</h3>
+                        ${submissionsList.length === 0 ? '<p style="color: #6b7280;">No submissions yet</p>' : ''}
+                        ${submissionsList.map(sub => `
+                            <div class="submission-item">
+                                <div class="submission-header">
+                                    <div>
+                                        <div class="submission-team">${sub.team}</div>
+                                        <div class="submission-task">Task ${sub.taskIndex + 1}: ${tasks[sub.taskIndex]}</div>
+                                    </div>
+                                    <div class="submission-timestamp">${new Date(sub.timestamp).toLocaleString()}</div>
+                                </div>
+                                ${sub.photoURL ? `<img src="${sub.photoURL}" class="submission-photo">` : ''}
+                                ${sub.description ? `<div class="submission-text">"${sub.description}"</div>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
 
             return `
                 <div class="bg-gradient-purple">
@@ -533,62 +782,16 @@
                                 </div>
                                 <h1 class="title">Taskmaster Control Center</h1>
                             </div>
-                            <p class="subtitle">Share the unique URLs below with each team. Each team can only access their own page.</p>
                             
-                            <div class="grid grid-2">
-                                ${teams.map(team => {
-                                    const stats = getCompletionStats(team.name);
-                                    const teamUrl = generateTeamURL(team.code);
-                                    return `
-                                        <div class="team-card">
-                                            <div class="team-header">
-                                                <div class="team-name">
-                                                    <div class="task-icon icon-purple">
-                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                                            <circle cx="9" cy="7" r="4"/>
-                                                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                                                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                                                        </svg>
-                                                    </div>
-                                                    <h2>${team.name}</h2>
-                                                </div>
-                                                <div class="team-stats">
-                                                    <div class="team-score">${stats.completed}/40</div>
-                                                    <div class="team-percentage">${stats.percentage}% complete</div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="url-box">
-                                                <div class="url-label">Team URL:</div>
-                                                <div class="url-text">${teamUrl}</div>
-                                                <button class="btn btn-blue" onclick="window.copyToClipboard('${teamUrl}')">
-                                                    Copy URL
-                                                </button>
-                                            </div>
-                                            
-                                            <div class="qr-box">
-                                                <img src="${generateQRCode(team.code)}" alt="QR Code for ${team.name}">
-                                            </div>
-                                            
-                                            <button class="btn btn-purple" onclick="window.viewTeam('${team.name}')">
-                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <line x1="8" y1="6" x2="21" y2="6"/>
-                                                    <line x1="8" y1="12" x2="21" y2="12"/>
-                                                    <line x1="8" y1="18" x2="21" y2="18"/>
-                                                    <line x1="3" y1="6" x2="3.01" y2="6"/>
-                                                    <line x1="3" y1="12" x2="3.01" y2="12"/>
-                                                    <line x1="3" y1="18" x2="3.01" y2="18"/>
-                                                </svg>
-                                                View Team Tasks
-                                            </button>
-                                        </div>
-                                    `;
-                                }).join('')}
+                            <div class="tab-buttons">
+                                <button class="tab-btn ${adminTab === 'overview' ? 'active' : ''}" onclick="window.setAdminTab('overview')">Overview</button>
+                                <button class="tab-btn ${adminTab === 'submissions' ? 'active' : ''}" onclick="window.setAdminTab('submissions')">Submissions</button>
                             </div>
                             
+                            ${tabContent}
+                            
                             <button class="btn btn-red" onclick="window.resetAllData()">
-                                Reset All Progress
+                                Reset All Progress & Submissions
                             </button>
                         </div>
 
@@ -661,24 +864,56 @@
                             <div class="task-list">
                                 ${tasks.map((task, index) => {
                                     const isCompleted = teamData[selectedTeam]?.[index] || false;
+                                    const submissionKey = `${selectedTeam}_${index}`;
+                                    const submission = submissions[submissionKey];
+                                    
                                     return `
-                                        <div class="task-item ${isCompleted ? 'completed' : ''}" onclick="window.toggleTask('${selectedTeam}', ${index})" style="${!isCompleted ? `border-color: ${team.colors.to}33;` : ''}">
-                                            <div class="task-icon ${isCompleted ? 'icon-green' : ''}" style="${!isCompleted ? `color: ${team.colors.via};` : ''}">
-                                                ${isCompleted ? `
-                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
-                                                        <path d="m9 12 2 2 4-4"/>
-                                                    </svg>
-                                                ` : `
-                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <circle cx="12" cy="12" r="10"/>
-                                                    </svg>
-                                                `}
+                                        <div class="task-item ${isCompleted ? 'completed' : ''}" style="${!isCompleted ? `border-color: ${team.colors.to}33;` : ''}">
+                                            <div class="task-header-section" onclick="window.toggleTaskForm(${index})">
+                                                <div class="task-icon ${isCompleted ? 'icon-green' : ''}" style="${!isCompleted ? `color: ${team.colors.via};` : ''}">
+                                                    ${isCompleted ? `
+                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                                                            <path d="m9 12 2 2 4-4"/>
+                                                        </svg>
+                                                    ` : `
+                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                            <circle cx="12" cy="12" r="10"/>
+                                                        </svg>
+                                                    `}
+                                                </div>
+                                                <div class="task-content">
+                                                    <span class="task-number ${isCompleted ? 'completed' : ''}" style="${!isCompleted ? `color: ${team.colors.via};` : ''}">Task ${index + 1}</span>
+                                                    <p class="task-text ${isCompleted ? 'completed' : ''}">${task}</p>
+                                                </div>
                                             </div>
-                                            <div class="task-content">
-                                                <span class="task-number ${isCompleted ? 'completed' : ''}" style="${!isCompleted ? `color: ${team.colors.via};` : ''}">Task ${index + 1}</span>
-                                                <p class="task-text ${isCompleted ? 'completed' : ''}">${task}</p>
-                                            </div>
+                                            
+                                            ${!isCompleted ? `
+                                                <div id="form-${index}" class="submission-form">
+                                                    <form onsubmit="window.handleSubmit('${selectedTeam}', ${index}, event)">
+                                                        <div class="form-group">
+                                                            <label class="form-label">Description (optional)</label>
+                                                            <textarea id="desc-${index}" class="form-textarea" placeholder="Describe what you did..."></textarea>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="form-label">Photo Evidence</label>
+                                                            <div class="file-input-wrapper">
+                                                                <label class="file-input-btn">
+                                                                    📷 Choose Photo
+                                                                    <input type="file" id="photo-${index}" accept="image/*" capture="environment" onchange="window.handleFileSelect(${index}, event)">
+                                                                </label>
+                                                            </div>
+                                                            <div id="preview-${index}"></div>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-purple">Submit Task</button>
+                                                    </form>
+                                                </div>
+                                            ` : submission ? `
+                                                <div class="submission-display">
+                                                    ${submission.photoURL ? `<img src="${submission.photoURL}" class="submission-photo">` : ''}
+                                                    ${submission.description ? `<div class="submission-text">"${submission.description}"</div>` : ''}
+                                                </div>
+                                            ` : ''}
                                         </div>
                                     `;
                                 }).join('')}
@@ -717,10 +952,13 @@
         }
 
         // Expose functions globally
-        window.toggleTask = toggleTask;
+        window.toggleTaskForm = toggleTaskForm;
+        window.handleFileSelect = handleFileSelect;
+        window.handleSubmit = handleSubmit;
         window.viewTeam = viewTeam;
         window.copyToClipboard = copyToClipboard;
         window.resetAllData = resetAllData;
+        window.setAdminTab = setAdminTab;
     </script>
 </body>
 </html>
