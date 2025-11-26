@@ -159,10 +159,6 @@
         .btn-red:hover {
             background: #dc2626;
         }
-        .btn-small {
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-        }
         .qr-box {
             background: white;
             border-radius: 0.5rem;
@@ -460,13 +456,11 @@
     <div id="root">
         <div class="loading">Loading...</div>
     </div>
-    
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, set, onValue, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyD8QQ1IzI31E0WXjf4azJ0JlTnkHLba6_E",
             authDomain: "taskmaster-d8b0d.firebaseapp.com",
@@ -483,15 +477,8 @@
             app = initializeApp(firebaseConfig);
             database = getDatabase(app);
             storage = getStorage(app);
-            console.log('Firebase initialized successfully');
         } catch (error) {
             console.error('Firebase initialization error:', error);
-            document.getElementById('root').innerHTML = `
-                <div class="error">
-                    <h2>Connection Error</h2>
-                    <p>Could not connect to Firebase: ${error.message}</p>
-                </div>
-            `;
         }
 
         const teams = [
@@ -550,8 +537,10 @@
         let tasks = defaultTasks;
         let teamData = {};
         let submissions = {};
+        let adminAuthenticated = false;
+        
+        const ADMIN_PASSWORD = 'taskmaster2024';
 
-        // Listen for real-time updates
         if (database) {
             const dataRef = ref(database, 'taskmaster');
             onValue(dataRef, (snapshot) => {
@@ -564,8 +553,6 @@
                     initializeData();
                 }
                 render();
-            }, (error) => {
-                console.error('Firebase read error:', error);
             });
         }
 
@@ -692,6 +679,48 @@
             render();
         }
 
+        function checkAdminPassword() {
+            const input = document.getElementById('admin-password-input');
+            if (input && input.value === ADMIN_PASSWORD) {
+                adminAuthenticated = true;
+                render();
+            } else {
+                alert('Incorrect password');
+            }
+        }
+
+        function renderAdminLogin() {
+            return `
+                <div class="bg-gradient-purple">
+                    <div class="container">
+                        <div class="card" style="max-width: 400px; margin: 4rem auto;">
+                            <div class="header">
+                                <div class="task-icon icon-yellow">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                    </svg>
+                                </div>
+                                <h1 class="title" style="font-size: 1.5rem;">Admin Access</h1>
+                            </div>
+                            <p style="color: #6b7280; margin-bottom: 1.5rem;">Enter the admin password to continue</p>
+                            <div class="form-group">
+                                <input 
+                                    type="password" 
+                                    id="admin-password-input" 
+                                    class="form-input" 
+                                    placeholder="Password"
+                                    onkeypress="if(event.key === 'Enter') window.checkAdminPassword()"
+                                >
+                            </div>
+                            <button class="btn btn-purple" onclick="window.checkAdminPassword()">
+                                Unlock Admin Panel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
         function renderAdmin() {
             const sortedTeams = teams.map(team => ({
                 ...team,
@@ -830,7 +859,6 @@
                 </div>
             `;
         }
-
         function renderTeam() {
             const stats = getCompletionStats(selectedTeam);
             const team = teams.find(t => t.name === selectedTeam);
@@ -948,13 +976,16 @@
         function render() {
             const root = document.getElementById('root');
             if (currentView === 'admin') {
-                root.innerHTML = renderAdmin();
+                if (!adminAuthenticated) {
+                    root.innerHTML = renderAdminLogin();
+                } else {
+                    root.innerHTML = renderAdmin();
+                }
             } else {
                 root.innerHTML = renderTeam();
             }
         }
 
-        // Check URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const teamCode = urlParams.get('team');
 
@@ -966,7 +997,6 @@
             }
         }
 
-        // Expose functions globally
         window.toggleTaskForm = toggleTaskForm;
         window.handleFileSelect = handleFileSelect;
         window.handleSubmit = handleSubmit;
@@ -975,6 +1005,7 @@
         window.copyToClipboard = copyToClipboard;
         window.resetAllData = resetAllData;
         window.setAdminTab = setAdminTab;
+        window.checkAdminPassword = checkAdminPassword;
     </script>
 </body>
 </html>
