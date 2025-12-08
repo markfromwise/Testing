@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taskmaster Team Tracker</title>
+    <title>Taskmaster Teams</title>
     <style>
         * {
             margin: 0;
@@ -14,19 +14,10 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             min-height: 100vh;
         }
-        .bg-gradient-purple {
-            background: linear-gradient(135deg, #9333ea 0%, #ec4899 50%, #ef4444 100%);
-            min-height: 100vh;
-            padding: 1rem;
-        }
         .bg-gradient-blue {
             background: linear-gradient(135deg, #2563eb 0%, #a855f7 50%, #ec4899 100%);
             min-height: 100vh;
             padding: 1rem;
-        }
-        .container {
-            max-width: 72rem;
-            margin: 0 auto;
         }
         .container-small {
             max-width: 56rem;
@@ -38,179 +29,6 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
             padding: 2rem;
             margin-bottom: 2rem;
-        }
-        .team-card {
-            background: linear-gradient(135deg, #eff6ff 0%, #f3e8ff 100%);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            border: 2px solid #d8b4fe;
-        }
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-        .title {
-            font-size: 2.25rem;
-            font-weight: bold;
-            color: #1f2937;
-        }
-        .subtitle {
-            color: #6b7280;
-            font-size: 1.125rem;
-            margin-bottom: 2rem;
-        }
-        .grid {
-            display: grid;
-            gap: 1.5rem;
-        }
-        @media (min-width: 768px) {
-            .grid-2 {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        .team-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-        .team-name {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .team-name h2 {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #1f2937;
-        }
-        .team-stats {
-            text-align: right;
-        }
-        .team-score {
-            font-size: 1.875rem;
-            font-weight: bold;
-            color: #9333ea;
-        }
-        .team-percentage {
-            font-size: 0.875rem;
-            color: #6b7280;
-        }
-        .url-box {
-            background: white;
-            border-radius: 0.5rem;
-            padding: 0.75rem;
-            margin-bottom: 0.75rem;
-        }
-        .url-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #6b7280;
-            margin-bottom: 0.5rem;
-        }
-        .url-text {
-            background: #f9fafb;
-            padding: 0.5rem;
-            border-radius: 0.25rem;
-            border: 1px solid #e5e7eb;
-            word-break: break-all;
-            font-size: 0.875rem;
-            color: #374151;
-            font-family: monospace;
-        }
-        .btn {
-            width: 100%;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-            font-size: 0.875rem;
-        }
-        .btn-blue {
-            background: #3b82f6;
-            color: white;
-            margin-top: 0.5rem;
-        }
-        .btn-blue:hover {
-            background: #2563eb;
-        }
-        .btn-purple {
-            background: #9333ea;
-            color: white;
-            padding: 0.75rem 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        .btn-purple:hover {
-            background: #7e22ce;
-        }
-        .btn-red {
-            background: #ef4444;
-            color: white;
-            padding: 0.75rem 1rem;
-            margin-top: 1rem;
-        }
-        .btn-red:hover {
-            background: #dc2626;
-        }
-        .qr-box {
-            background: white;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-        .qr-box img {
-            width: 100%;
-            height: auto;
-        }
-        .leaderboard-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            background: #f9fafb;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-        }
-        .rank {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        .rank-1 { color: #eab308; }
-        .rank-2 { color: #9ca3af; }
-        .rank-3 { color: #d97706; }
-        .rank-other { color: #9ca3af; }
-        .leaderboard-info {
-            flex: 1;
-        }
-        .leaderboard-name {
-            font-weight: 600;
-            color: #1f2937;
-        }
-        .progress-bar {
-            width: 100%;
-            background: #e5e7eb;
-            border-radius: 9999px;
-            height: 0.5rem;
-            margin-top: 0.25rem;
-            overflow: hidden;
-        }
-        .progress-fill {
-            background: #9333ea;
-            height: 100%;
-            border-radius: 9999px;
-            transition: width 0.3s;
-        }
-        .leaderboard-score {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #9333ea;
         }
         .progress-box {
             background: linear-gradient(90deg, #f3e8ff 0%, #fce7f3 100%);
@@ -387,10 +205,36 @@
             color: #374151;
             font-style: italic;
         }
-        .icon-yellow { color: #eab308; }
-        .icon-purple { color: #9333ea; }
+        .btn {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+        .btn-blue {
+            background: #3b82f6;
+            color: white;
+        }
+        .btn-blue:hover {
+            background: #2563eb;
+        }
+        .btn-purple {
+            background: #9333ea;
+            color: white;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-purple:hover {
+            background: #7e22ce;
+        }
         .icon-green { color: #16a34a; }
-        .icon-gray { color: #9ca3af; }
         svg {
             width: 100%;
             height: 100%;
@@ -407,56 +251,12 @@
             border-radius: 0.5rem;
             margin: 1rem;
         }
-        .tab-buttons {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        .tab-btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            background: #e5e7eb;
-            color: #6b7280;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .tab-btn.active {
-            background: #9333ea;
-            color: white;
-        }
-        .submission-item {
-            background: #f9fafb;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border: 2px solid #e5e7eb;
-        }
-        .submission-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 0.5rem;
-        }
-        .submission-team {
-            font-weight: 600;
-            color: #1f2937;
-        }
-        .submission-task {
-            font-size: 0.875rem;
-            color: #6b7280;
-        }
-        .submission-timestamp {
-            font-size: 0.75rem;
-            color: #9ca3af;
-        }
     </style>
 </head>
 <body>
     <div id="root">
         <div class="loading">Loading...</div>
-    </div>
-    <script type="module">
+        <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, set, onValue, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
@@ -531,15 +331,10 @@
             "Make up and perform a team cheer"
         ];
 
-        let currentView = 'admin';
-        let adminTab = 'overview';
         let selectedTeam = null;
         let tasks = defaultTasks;
         let teamData = {};
         let submissions = {};
-        let adminAuthenticated = false;
-        
-        const ADMIN_PASSWORD = 'taskmaster2024';
 
         if (database) {
             const dataRef = ref(database, 'taskmaster');
@@ -549,24 +344,8 @@
                     tasks = data.tasks || defaultTasks;
                     teamData = data.teamData || {};
                     submissions = data.submissions || {};
-                } else {
-                    initializeData();
                 }
                 render();
-            });
-        }
-
-        function initializeData() {
-            const initialData = {};
-            teams.forEach(team => {
-                initialData[team.name] = Array(40).fill(false);
-            });
-            
-            const dataRef = ref(database, 'taskmaster');
-            set(dataRef, {
-                tasks: defaultTasks,
-                teamData: initialData,
-                submissions: {}
             });
         }
 
@@ -613,22 +392,6 @@
             }
         }
 
-        function resetAllData() {
-            if (confirm('Are you sure you want to reset ALL team progress and submissions? This cannot be undone!')) {
-                initializeData();
-            }
-        }
-
-        function generateTeamURL(teamCode) {
-            const baseUrl = window.location.href.split('?')[0].split('#')[0];
-            return `${baseUrl}?team=${teamCode}`;
-        }
-
-        function generateQRCode(teamCode) {
-            const url = generateTeamURL(teamCode);
-            return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
-        }
-
         function getCompletionStats(teamName) {
             if (!teamData[teamName]) return { completed: 0, total: 40, percentage: 0 };
             const completed = teamData[teamName].filter(t => t).length;
@@ -637,12 +400,6 @@
                 total: 40,
                 percentage: Math.round((completed / 40) * 100)
             };
-        }
-
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('URL copied to clipboard!');
-            });
         }
 
         function toggleTaskForm(taskIndex) {
@@ -674,191 +431,6 @@
             submitTask(teamName, taskIndex, description, photoFile);
         }
 
-        function setAdminTab(tab) {
-            adminTab = tab;
-            render();
-        }
-
-        function checkAdminPassword() {
-            const input = document.getElementById('admin-password-input');
-            if (input && input.value === ADMIN_PASSWORD) {
-                adminAuthenticated = true;
-                render();
-            } else {
-                alert('Incorrect password');
-            }
-        }
-
-        function renderAdminLogin() {
-            return `
-                <div class="bg-gradient-purple">
-                    <div class="container">
-                        <div class="card" style="max-width: 400px; margin: 4rem auto;">
-                            <div class="header">
-                                <div class="task-icon icon-yellow">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                                    </svg>
-                                </div>
-                                <h1 class="title" style="font-size: 1.5rem;">Admin Access</h1>
-                            </div>
-                            <p style="color: #6b7280; margin-bottom: 1.5rem;">Enter the admin password to continue</p>
-                            <div class="form-group">
-                                <input 
-                                    type="password" 
-                                    id="admin-password-input" 
-                                    class="form-input" 
-                                    placeholder="Password"
-                                    onkeypress="if(event.key === 'Enter') window.checkAdminPassword()"
-                                >
-                            </div>
-                            <button class="btn btn-purple" onclick="window.checkAdminPassword()">
-                                Unlock Admin Panel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        function renderAdmin() {
-            const sortedTeams = teams.map(team => ({
-                ...team,
-                ...getCompletionStats(team.name)
-            })).sort((a, b) => b.completed - a.completed);
-
-            let tabContent = '';
-            
-            if (adminTab === 'overview') {
-                tabContent = `
-                    <div class="grid grid-2">
-                        ${teams.map(team => {
-                            const stats = getCompletionStats(team.name);
-                            const teamUrl = generateTeamURL(team.code);
-                            return `
-                                <div class="team-card">
-                                    <div class="team-header">
-                                        <div class="team-name">
-                                            <div class="task-icon icon-purple">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                                                    <circle cx="9" cy="7" r="4"/>
-                                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                                                </svg>
-                                            </div>
-                                            <h2>${team.name}</h2>
-                                        </div>
-                                        <div class="team-stats">
-                                            <div class="team-score">${stats.completed}/40</div>
-                                            <div class="team-percentage">${stats.percentage}% complete</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="url-box">
-                                        <div class="url-label">Team URL:</div>
-                                        <div class="url-text">${teamUrl}</div>
-                                        <button class="btn btn-blue" onclick="window.copyToClipboard('${teamUrl}')">
-                                            Copy URL
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="qr-box">
-                                        <img src="${generateQRCode(team.code)}" alt="QR Code for ${team.name}">
-                                    </div>
-                                    
-                                    <button class="btn btn-purple" onclick="window.viewTeam('${team.name}')">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <line x1="8" y1="6" x2="21" y2="6"/>
-                                            <line x1="8" y1="12" x2="21" y2="12"/>
-                                            <line x1="8" y1="18" x2="21" y2="18"/>
-                                            <line x1="3" y1="6" x2="3.01" y2="6"/>
-                                            <line x1="3" y1="12" x2="3.01" y2="12"/>
-                                            <line x1="3" y1="18" x2="3.01" y2="18"/>
-                                        </svg>
-                                        View Team Tasks
-                                    </button>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                `;
-            } else {
-                const submissionsList = Object.values(submissions).sort((a, b) => b.timestamp - a.timestamp);
-                tabContent = `
-                    <div>
-                        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">All Submissions (${submissionsList.length})</h3>
-                        ${submissionsList.length === 0 ? '<p style="color: #6b7280;">No submissions yet</p>' : ''}
-                        ${submissionsList.map(sub => `
-                            <div class="submission-item">
-                                <div class="submission-header">
-                                    <div>
-                                        <div class="submission-team">${sub.team}</div>
-                                        <div class="submission-task">Task ${sub.taskIndex + 1}: ${tasks[sub.taskIndex]}</div>
-                                    </div>
-                                    <div class="submission-timestamp">${new Date(sub.timestamp).toLocaleString()}</div>
-                                </div>
-                                ${sub.photoURL ? `<img src="${sub.photoURL}" class="submission-photo">` : ''}
-                                ${sub.description ? `<div class="submission-text">"${sub.description}"</div>` : ''}
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-
-            return `
-                <div class="bg-gradient-purple">
-                    <div class="container">
-                        <div class="card">
-                            <div class="header">
-                                <div class="task-icon icon-yellow">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-                                        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-                                        <path d="M4 22h16"/>
-                                        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-                                        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-                                        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
-                                    </svg>
-                                </div>
-                                <h1 class="title">Taskmaster Control Center</h1>
-                            </div>
-                            
-                            <div class="tab-buttons">
-                                <button class="tab-btn ${adminTab === 'overview' ? 'active' : ''}" onclick="window.setAdminTab('overview')">Overview</button>
-                                <button class="tab-btn ${adminTab === 'submissions' ? 'active' : ''}" onclick="window.setAdminTab('submissions')">Submissions</button>
-                            </div>
-                            
-                            ${tabContent}
-                            
-                            <button class="btn btn-red" onclick="window.resetAllData()">
-                                Reset All Progress & Submissions
-                            </button>
-                        </div>
-
-                        <div class="card">
-                            <h2 style="font-size: 1.5rem; font-weight: bold; color: #1f2937; margin-bottom: 1rem;">Leaderboard</h2>
-                            <div>
-                                ${sortedTeams.map((item, index) => `
-                                    <div class="leaderboard-item">
-                                        <div class="rank rank-${index === 0 ? '1' : index === 1 ? '2' : index === 2 ? '3' : 'other'}">
-                                            #${index + 1}
-                                        </div>
-                                        <div class="leaderboard-info">
-                                            <div class="leaderboard-name">${item.name}</div>
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: ${item.percentage}%"></div>
-                                            </div>
-                                        </div>
-                                        <div class="leaderboard-score">${item.completed}/40</div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
         function renderTeam() {
             const stats = getCompletionStats(selectedTeam);
             const team = teams.find(t => t.name === selectedTeam);
@@ -967,22 +539,12 @@
             `;
         }
 
-        function viewTeam(teamName) {
-            selectedTeam = teamName;
-            currentView = 'team';
-            render();
-        }
-
         function render() {
             const root = document.getElementById('root');
-            if (currentView === 'admin') {
-                if (!adminAuthenticated) {
-                    root.innerHTML = renderAdminLogin();
-                } else {
-                    root.innerHTML = renderAdmin();
-                }
-            } else {
+            if (selectedTeam) {
                 root.innerHTML = renderTeam();
+            } else {
+                root.innerHTML = '<div class="error">Invalid team code</div>';
             }
         }
 
@@ -993,7 +555,6 @@
             const team = teams.find(t => t.code === teamCode);
             if (team) {
                 selectedTeam = team.name;
-                currentView = 'team';
             }
         }
 
@@ -1001,11 +562,7 @@
         window.handleFileSelect = handleFileSelect;
         window.handleSubmit = handleSubmit;
         window.markComplete = markComplete;
-        window.viewTeam = viewTeam;
-        window.copyToClipboard = copyToClipboard;
-        window.resetAllData = resetAllData;
-        window.setAdminTab = setAdminTab;
-        window.checkAdminPassword = checkAdminPassword;
     </script>
 </body>
 </html>
+    </div>
